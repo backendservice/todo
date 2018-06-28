@@ -1,0 +1,18 @@
+{
+    "family": "todos",
+    "containerDefinitions": [
+        {
+            "name": "todos",
+            "image": "aws_account_id.dkr.ecr.us-east-2.amazonaws.com/todos",
+            "cpu": 2,
+            "memory": 128,
+            "portMappings": [
+                {
+                    "containerPort": 50080,
+                    "hostPort": 50080
+                }
+            ],
+            "essential": true
+        }
+    ]
+}
