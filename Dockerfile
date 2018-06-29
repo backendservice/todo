@@ -1,5 +1,6 @@
 FROM golang:1.10
 
+ENV AWS_REGION us-west-2
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
@@ -12,4 +13,4 @@ RUN dep ensure
 
 EXPOSE 50080
 RUN go build -o server *.go
-CMD ["AWS_REGION=us-west-2 ./server"]
+CMD ["./server"]
