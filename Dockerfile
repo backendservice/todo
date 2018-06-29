@@ -12,4 +12,4 @@ RUN dep ensure
 
 EXPOSE 50080
 RUN go build -o server *.go
-CMD ["./server"]
+CMD ["AWS_REGION=us-west-2 ./server"]
