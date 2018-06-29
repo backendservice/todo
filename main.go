@@ -1,5 +1,6 @@
 package main
 
+<<<<<<< HEAD
 import (
 	"encoding/json"
 	"net/http"
@@ -47,4 +48,10 @@ func handleStatic() {
 func getID(r *http.Request) string {
 	pathElems := strings.Split(r.RequestURI, "/")
 	return pathElems[len(pathElems)-1]
+=======
+import "fmt"
+
+func main() {
+	fmt.Println("Hello World")
+>>>>>>> 1840a5d23656e7d9a6d0299cb7be6bef8da3ac0a
 }
