@@ -15,7 +15,10 @@ func main() {
 	http.HandleFunc("/service/todos/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
-			json.NewEncoder(w).Encode([]Item{Item1()}) // TODO: implement
+			result := instance.List()
+			json.NewEncoder(w).Encode(result) // TODO: implement
+		case "PUT":
+			fallthrough
 		case "POST":
 			var item Item
 			if r.Body == nil {
@@ -26,8 +29,23 @@ func main() {
 				http.Error(w, err.Error(), 400)
 				return
 			}
-			instance.Create(item)
-			w.WriteHeader(http.StatusCreated)
+			if r.Method == "POST" {
+				instance.Create(item)
+				w.WriteHeader(http.StatusCreated)
+			} else {
+				if err := instance.Update(item); err != nil {
+					if serviceErr, ok := err.(*ServiceError); ok {
+						w.WriteHeader(serviceErr.Code)
+					} else {
+						w.WriteHeader(http.StatusInternalServerError)
+					}
+					return
+				}
+				w.WriteHeader(http.StatusOK)
+			}
+		case "DELETE":
+			id := getID(r)
+			instance.Delete(id)
 		}
 	})
 
