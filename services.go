@@ -14,28 +14,27 @@ type Service interface {
 
 type inMemoryService struct {
 	todos       map[string]Item
-	sortedTodos []Item
+	sortedTodos []string
 }
 
 // NewInMemoryService provides a instance of in-memory implementation
 func NewInMemoryService() Service {
 	return &inMemoryService{
-		todos:       map[string]Item{},
-		sortedTodos: []Item{},
+		todos: map[string]Item{},
 	}
 }
 
 func (s *inMemoryService) Create(item Item) error {
 	item.CreatedAt = time.Now()
 	s.todos[item.ID] = item
-	// s.sortedTodos = append(s.sortedTodos, item)
+	s.sortedTodos = append(s.sortedTodos, item.ID)
 	return nil
 }
 
 func (s *inMemoryService) List() []Item {
 
 	var items []Item
-	for k := range s.todos {
+	for _, k := range s.sortedTodos {
 		items = append(items, s.todos[k])
 	}
 	return items
