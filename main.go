@@ -31,7 +31,7 @@ func main() {
 				return
 			}
 			if err := instance.Create(item); err != nil {
-				http.Error(w, "InternalServerError", 500)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
 			w.WriteHeader(http.StatusCreated)
 
@@ -50,7 +50,9 @@ func main() {
 
 		case "DELETE":
 			id := getID(r)
-			instance.Delete(id)
+			if err := instance.Delete(id); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
 			w.WriteHeader(http.StatusOK)
 		}
 	})

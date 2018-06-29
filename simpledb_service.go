@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/simpledb"
@@ -30,7 +31,7 @@ func (s *SimpleDBService) Create(item Item) error {
 	completed := "completed"
 	completedValue := strconv.FormatBool(item.Completed)
 	createdAtName := "created_at"
-	createdAtValue := fmt.Sprintf("%d", item.CreatedAt.Unix())
+	createdAtValue := time.Now().Format(time.RFC3339)
 
 	in := &simpledb.PutAttributesInput{
 		ItemName:   &item.ID,
