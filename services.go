@@ -7,7 +7,7 @@ import (
 // Service defines what todo list service can do
 type Service interface {
 	Create(Item) error
-	List() []Item
+	List() ([]Item, error)
 	Update(Item) error
 	Delete(string) error
 }
@@ -32,8 +32,8 @@ func (s *inMemoryService) Create(item Item) error {
 	return nil
 }
 
-func (s *inMemoryService) List() []Item {
-	return s.todos
+func (s *inMemoryService) List() ([]Item, error) {
+	return s.todos, nil
 }
 
 func (s *inMemoryService) Update(item Item) error {

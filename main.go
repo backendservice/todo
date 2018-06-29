@@ -11,11 +11,16 @@ const (
 )
 
 func main() {
-	instance := NewInMemoryService()
+	instance := NewSimpleDBService("ethos93")
 	http.HandleFunc("/service/todos/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
-			json.NewEncoder(w).Encode(instance.List()) // TODO: implement
+			result, err := instance.List()
+			if err != nil {
+				http.Error(w, err.Error(), 400)
+				return
+			}
+			json.NewEncoder(w).Encode(result)
 		case "POST":
 			var item Item
 			if r.Body == nil {
