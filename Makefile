@@ -10,4 +10,4 @@ genmock:
 docker:
 	docker build -t todos .
 run-docker:
-	docker run -it --rm -p 50080:50080 todos
+	docker run -it --rm -e AWS_ACCESS_KEY_ID=AKIAINVNBB4S7ZT6N76Q -e AWS_SECRET_ACCESS_KEY=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 -p 50080:50080 todos
