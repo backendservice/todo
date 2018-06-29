@@ -15,7 +15,7 @@ func main() {
 	http.HandleFunc("/service/todos/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
-			json.NewEncoder(w).Encode([]Item{Item1()}) // TODO: implement
+			json.NewEncoder(w).Encode(instance.List())
 		case "POST":
 			var item Item
 			if r.Body == nil {
@@ -28,6 +28,24 @@ func main() {
 			}
 			instance.Create(item)
 			w.WriteHeader(http.StatusCreated)
+
+		case "PUT":
+			var item Item
+			if r.Body == nil {
+				http.Error(w, "Please send a request body", 400)
+				return
+			}
+			if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
+				http.Error(w, err.Error(), 400)
+				return
+			}
+			instance.Update(item)
+			w.WriteHeader(http.StatusOK)
+
+		case "DELETE":
+			id := getID(r)
+			instance.Delete(id)
+			w.WriteHeader(http.StatusOK)
 		}
 	})
 
