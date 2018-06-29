@@ -1,13 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"time"
 )
 
 // Service defines what todo list service can do
 type Service interface {
 	Create(Item) error
-	List() []Item
+	List() ([]Item, error)
 	Update(Item) error
 	Delete(string) error
 }
@@ -31,13 +32,13 @@ func (s *inMemoryService) Create(item Item) error {
 	return nil
 }
 
-func (s *inMemoryService) List() []Item {
+func (s *inMemoryService) List() ([]Item, error) {
 
 	var items []Item
 	for _, k := range s.sortedTodos {
 		items = append(items, s.todos[k])
 	}
-	return items
+	return items, nil
 }
 
 func (s *inMemoryService) Update(item Item) error {
@@ -53,5 +54,8 @@ func (s *inMemoryService) Delete(id string) error {
 		delete(s.todos, id)
 	}
 
+	for k, v := range s.todos {
+		fmt.Println(k, v)
+	}
 	return nil
 }
