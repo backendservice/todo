@@ -11,12 +11,15 @@ const (
 )
 
 func main() {
-	instance := NewInMemoryService()
+	instance := NewSimpleDBService("todo_20180629")
 	http.HandleFunc("/service/todos/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
-			result := instance.List()
-			json.NewEncoder(w).Encode(result) // TODO: implement
+			if result, err := instance.List(); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			} else {
+				json.NewEncoder(w).Encode(result)
+			}
 		case "PUT":
 			fallthrough
 		case "POST":
@@ -30,7 +33,10 @@ func main() {
 				return
 			}
 			if r.Method == "POST" {
-				instance.Create(item)
+				if err := instance.Create(item); err != nil {
+					http.Error(w, err.Error(), 500)
+					return
+				}
 				w.WriteHeader(http.StatusCreated)
 			} else {
 				if err := instance.Update(item); err != nil {
@@ -45,7 +51,9 @@ func main() {
 			}
 		case "DELETE":
 			id := getID(r)
-			instance.Delete(id)
+			if err := instance.Delete(id); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
 		}
 	})
 

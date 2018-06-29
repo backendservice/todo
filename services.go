@@ -7,7 +7,7 @@ import (
 // Service defines what todo list service can do
 type Service interface {
 	Create(Item) error
-	List() []Item
+	List() ([]Item, error)
 	Update(Item) error
 	Delete(string) error
 }
@@ -31,12 +31,12 @@ func (s *inMemoryService) Create(item Item) error {
 	return nil
 }
 
-func (s *inMemoryService) List() []Item {
+func (s *inMemoryService) List() ([]Item, error) {
 	var result []Item
 	for _, k := range s.todoSeq {
 		result = append(result, s.todos[k])
 	}
-	return result
+	return result, nil
 }
 
 func (s *inMemoryService) Update(item Item) error {
