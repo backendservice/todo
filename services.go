@@ -6,9 +6,10 @@ import (
 
 // Service defines what todo list service can do
 type Service interface {
-	Create(Item) error
-	List() []Item
-	Update(Item) error
+	// Create(Item) error
+	List() ([]Item, error)
+	// Update(Item) error
+	Upsert(Item, bool) error
 	Delete(string) error
 }
 
@@ -25,28 +26,43 @@ func NewInMemoryService() Service {
 	}
 }
 
-func (s *inMemoryService) Create(item Item) error {
-	item.CreatedAt = time.Now()
-	s.todos[item.ID] = item
-	s.ids = append(s.ids, item.ID)
-	return nil
-}
+// func (s *inMemoryService) Create(item Item) error {
+// 	item.CreatedAt = time.Now()
+// 	s.todos[item.ID] = item
+// 	s.ids = append(s.ids, item.ID)
+// 	return nil
+// }
 
-func (s *inMemoryService) List() []Item {
+func (s *inMemoryService) List() ([]Item, error) {
 	var list []Item
 	for _, id := range s.ids {
 		if item, ok := s.todos[id]; ok {
 			list = append(list, item)
 		}
 	}
-	return list
+	return list, nil
 }
 
-func (s *inMemoryService) Update(item Item) error {
-	if _, ok := s.todos[item.ID]; ok {
+// func (s *inMemoryService) Update(item Item) error {
+// 	if _, ok := s.todos[item.ID]; ok {
+// 		s.todos[item.ID] = item
+// 	}else{
+// 		return NewNotFoundError("Not exist item.")
+// 	}
+// 	return nil
+// }
+
+func (s *inMemoryService) Upsert(item Item, isUpdate bool) error {
+	if isUpdate {
+		if _, ok := s.todos[item.ID]; ok {
+			s.todos[item.ID] = item
+		}else{
+			return NewNotFoundError("Not exist item.")
+		}
+	} else {
+		item.CreatedAt = time.Now()
 		s.todos[item.ID] = item
-	}else{
-		return NewNotFoundError("Not exist item.")
+		s.ids = append(s.ids, item.ID)
 	}
 	return nil
 }

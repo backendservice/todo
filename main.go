@@ -11,11 +11,16 @@ const (
 )
 
 func main() {
-	instance := NewInMemoryService()
+	instance := NewSimpleDBService("usol")
 	http.HandleFunc("/service/todos/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
-			json.NewEncoder(w).Encode(instance.List()) // TODO: implement
+			items, err := instance.List();
+			if err != nil {
+				http.Error(w, err.Error(), 500)
+				return
+			}
+			json.NewEncoder(w).Encode(items) // TODO: implement
 		case "PUT":
 			fallthrough
 		case "POST":
@@ -29,10 +34,14 @@ func main() {
 				return
 			}
 			if r.Method == "POST" {
-				instance.Create(item)
-				w.WriteHeader(http.StatusCreated)
+				if err := instance.Upsert(item, false); err == nil{
+					w.WriteHeader(http.StatusCreated)
+				}else{
+					http.Error(w, err.Error(), 500)
+					return
+				}
 			}else{
-				if err := instance.Update(item); err != nil{
+				if err := instance.Upsert(item, true); err != nil{
 					if svcErr, ok := err.(*ServiceError); ok {
 						w.WriteHeader(svcErr.Code)
 					}else{
@@ -42,7 +51,11 @@ func main() {
 				}
 			}
 		case "DELETE":
-			instance.Delete(getID(r))
+			if err := instance.Delete(getID(r)); err != nil{
+				http.Error(w, err.Error(), 500)
+			} else {
+				w.WriteHeader(http.StatusOK)
+			}
 		}
 	})
 
